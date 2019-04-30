@@ -41,9 +41,12 @@ TEST_F(Rosbag2TransportTestFixture, info_pretty_prints_information_from_bagfile)
   bagfile.topics_with_message_count.push_back({{"topic2", "type2", "rmw2"}, 200});
   EXPECT_CALL(*info_, read_metadata(_, _)).WillOnce(Return(bagfile));
 
+  rosbag2_transport::NodeOptions node_options{"", true};
+  rosbag2_transport::StorageOptions storage_options{"test", "sqlite3"};
   // the expected output uses a regex to handle different time zones.
-  rosbag2_transport::Rosbag2Transport transport(reader_, writer_, info_);
-  transport.print_bag_info("test", "sqlite3");
+  rosbag2_transport::Rosbag2Transport transport(
+    node_options, storage_options, reader_, writer_, info_);
+  transport.print_bag_info();
 
   std::string output = internal::GetCapturedStdout();
   EXPECT_THAT(output, ContainsRegex(

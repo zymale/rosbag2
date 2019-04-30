@@ -77,7 +77,7 @@ public:
   }
 
 private:
-  bool continue_spinning(std::unordered_map<std::string, size_t> expected_topics_with_sizes)
+  bool continue_spinning(const std::unordered_map<std::string, size_t> & expected_topics_with_sizes)
   {
     for (const auto & topic_expected : expected_topics_with_sizes) {
       if (subscribed_messages_[topic_expected.first].size() < topic_expected.second) {

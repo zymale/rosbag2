@@ -129,10 +129,12 @@ void Player::play_messages_from_queue()
 void Player::play_messages_until_queue_empty()
 {
   ReplayableMessage message;
+  static size_t counter = 0;
   while (message_queue_.try_dequeue(message) && rclcpp::ok()) {
     std::this_thread::sleep_until(start_time_ + message.time_since_start);
     if (rclcpp::ok()) {
       publishers_[message.message->topic_name]->publish(message.message->serialized_data);
+      fprintf(stderr, "publishing message %zu\n", (++counter));
     }
   }
 }

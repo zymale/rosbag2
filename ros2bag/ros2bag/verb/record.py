@@ -18,7 +18,7 @@ import os
 from ros2bag.verb import VerbExtension
 
 from ros2cli.node.strategy import NodeStrategy
-from ros2cli.node.strategy import add_arguments
+# from ros2cli.node.strategy import add_arguments
 from ros2cli.node import NODE_NAME_PREFIX
 from rosbag2_transport import rosbag2_transport_py
 
@@ -70,21 +70,24 @@ class RecordVerb(VerbExtension):
 
         self.create_bag_directory(uri)
 
+        py_transport = rosbag2_transport_py.create(
+            NODE_NAME_PREFIX,
+            uri,
+            args.storage)
+        if py_transport is None:
+            return '[ERROR] [ros2bag] Unable to create a transport instance'
+
         if args.all:
             rosbag2_transport_py.record(
-                uri=uri,
-                storage_id=args.storage,
+                py_transport,
                 serialization_format=args.serialization_format,
-                node_prefix=NODE_NAME_PREFIX,
                 all=True,
                 no_discovery=args.no_discovery,
                 polling_interval=args.polling_interval)
         elif args.topics and len(args.topics) > 0:
             rosbag2_transport_py.record(
-                uri=uri,
-                storage_id=args.storage,
+                py_transport,
                 serialization_format=args.serialization_format,
-                node_prefix=NODE_NAME_PREFIX,
                 no_discovery=args.no_discovery,
                 polling_interval=args.polling_interval,
                 topics=args.topics)

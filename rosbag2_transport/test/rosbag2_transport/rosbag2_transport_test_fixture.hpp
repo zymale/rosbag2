@@ -29,6 +29,7 @@
 # include <Windows.h>
 #endif
 
+#include "rosbag2_transport/node_options.hpp"
 #include "rosbag2_transport/play_options.hpp"
 #include "rosbag2_transport/storage_options.hpp"
 #include "rosbag2/sequential_reader.hpp"
@@ -56,7 +57,7 @@ class Rosbag2TransportTestFixture : public Test
 {
 public:
   Rosbag2TransportTestFixture()
-  : storage_options_({"uri", "storage_id"}), play_options_({1000}),
+  : node_options_({"", false}), storage_options_({"uri", "storage_id"}), play_options_({1000}),
     reader_(std::make_shared<MockSequentialReader>()),
     writer_(std::make_shared<MockWriter>()),
     info_(std::make_shared<MockInfo>()) {}
@@ -78,6 +79,7 @@ public:
 
   MemoryManagement memory_management_;
 
+  rosbag2_transport::NodeOptions node_options_;
   rosbag2_transport::StorageOptions storage_options_;
   rosbag2_transport::PlayOptions play_options_;
 

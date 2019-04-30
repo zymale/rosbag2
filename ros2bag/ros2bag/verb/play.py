@@ -33,14 +33,23 @@ class PlayVerb(VerbExtension):
             help='size of message queue rosbag tries to hold in memory to help deterministic '
                  'playback. Larger size will result in larger memory needs but might prevent '
                  'delay of message playback.')
+        parser.add_argument(
+            '-p', '--paused', action='store_true',
+            help='start rosbag2 in paused mode. No messages are being played.')
 
     def main(self, *, args):  # noqa: D102
         bag_file = args.bag_file
         if not os.path.exists(bag_file):
             return "[ERROR] [ros2bag] bag file '{}' does not exist!".format(bag_file)
 
+        py_transport = rosbag2_transport_py.create(
+            NODE_NAME_PREFIX,
+            bag_file,
+            args.storage)
+        if py_transport is None:
+            return '[ERROR] [ros2bag] Unable to create a transport instance'
+
         rosbag2_transport_py.play(
-            uri=bag_file,
-            storage_id=args.storage,
-            node_prefix=NODE_NAME_PREFIX,
-            read_ahead_queue_size=args.read_ahead_queue_size)
+            py_transport,
+            read_ahead_queue_size=args.read_ahead_queue_size,
+            paused=args.paused)

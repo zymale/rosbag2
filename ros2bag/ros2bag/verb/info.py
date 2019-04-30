@@ -15,7 +15,7 @@
 import os
 
 from ros2bag.verb import VerbExtension
-
+from ros2cli.node import NODE_NAME_PREFIX
 from rosbag2_transport import rosbag2_transport_py
 
 
@@ -35,4 +35,10 @@ class InfoVerb(VerbExtension):
         if not os.path.exists(bag_file):
             return "[ERROR] [ros2bag]: bag file '{}' does not exist!".format(bag_file)
 
-        rosbag2_transport_py.info(uri=bag_file, storage_id=args.storage)
+        py_transport = rosbag2_transport_py.create(
+            NODE_NAME_PREFIX,
+            bag_file,
+            args.storage)
+        if py_transport is None:
+            return '[ERROR] [ros2bag] Unable to create a transport instance'
+        rosbag2_transport_py.info(py_transport)

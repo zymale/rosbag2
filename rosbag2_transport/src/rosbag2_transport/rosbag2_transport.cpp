@@ -38,75 +38,77 @@
 namespace rosbag2_transport
 {
 
-Rosbag2Transport::Rosbag2Transport()
-: reader_(std::make_shared<rosbag2::SequentialReader>()),
-  writer_(std::make_shared<rosbag2::Writer>()),
-  info_(std::make_shared<rosbag2::Info>())
+Rosbag2Transport::Rosbag2Transport(NodeOptions node_options, StorageOptions storage_options)
+: Rosbag2Transport(
+    node_options,
+    storage_options,
+    std::make_shared<rosbag2::SequentialReader>(),
+    std::make_shared<rosbag2::Writer>(),
+    std::make_shared<rosbag2::Info>())
 {}
 
 Rosbag2Transport::Rosbag2Transport(
+  NodeOptions node_options,
+  StorageOptions storage_options,
   std::shared_ptr<rosbag2::SequentialReader> reader,
   std::shared_ptr<rosbag2::Writer> writer,
   std::shared_ptr<rosbag2::Info> info)
-: reader_(std::move(reader)), writer_(std::move(writer)), info_(std::move(info)) {}
-
-void Rosbag2Transport::init()
+: node_options_(std::move(node_options)),
+  storage_options_(std::move(storage_options)),
+  reader_(std::move(reader)),
+  writer_(std::move(writer)),
+  info_(std::move(info))
 {
-  rclcpp::init(0, nullptr);
+  if (node_options_.standalone && !rclcpp::is_initialized()) {
+    rclcpp::init(0, nullptr);
+  }
+  if (!transport_node_) {
+    transport_node_ = std::make_shared<Rosbag2Node>(node_options_.node_prefix + "_rosbag2");
+  }
 }
 
-void Rosbag2Transport::shutdown()
+Rosbag2Transport::~Rosbag2Transport()
 {
-  rclcpp::shutdown();
+  if (node_options_.standalone && rclcpp::is_initialized()) {
+    rclcpp::shutdown();
+  }
 }
 
-void Rosbag2Transport::record(
-  const StorageOptions & storage_options, const RecordOptions & record_options)
+void Rosbag2Transport::record(const RecordOptions & record_options)
 {
   try {
     writer_->open(
-      storage_options, {rmw_get_serialization_format(), record_options.rmw_serialization_format});
+      storage_options_, {rmw_get_serialization_format(), record_options.rmw_serialization_format});
 
-    auto transport_node = setup_node(record_options.node_prefix);
-
-    Recorder recorder(writer_, transport_node);
+    Recorder recorder(writer_, transport_node_);
     recorder.record(record_options);
   } catch (std::runtime_error & e) {
     ROSBAG2_TRANSPORT_LOG_ERROR("Failed to record: %s", e.what());
   }
 }
 
-std::shared_ptr<Rosbag2Node> Rosbag2Transport::setup_node(std::string node_prefix)
-{
-  if (!transport_node_) {
-    transport_node_ = std::make_shared<Rosbag2Node>(node_prefix + "_rosbag2");
-  }
-  return transport_node_;
-}
-
-void Rosbag2Transport::play(
-  const StorageOptions & storage_options, const PlayOptions & play_options)
+void Rosbag2Transport::play(const PlayOptions & play_options)
 {
   try {
-    reader_->open(storage_options, {"", rmw_get_serialization_format()});
+    reader_->open(storage_options_, {"", rmw_get_serialization_format()});
 
-    auto transport_node = setup_node(play_options.node_prefix);
-
-    Player player(reader_, transport_node);
+    Player player(reader_, transport_node_);
     player.play(play_options);
   } catch (std::runtime_error & e) {
     ROSBAG2_TRANSPORT_LOG_ERROR("Failed to play: %s", e.what());
   }
 }
 
-void Rosbag2Transport::print_bag_info(const std::string & uri, const std::string & storage_id)
+void Rosbag2Transport::print_bag_info()
 {
   rosbag2::BagMetadata metadata;
   try {
-    metadata = info_->read_metadata(uri, storage_id);
+    metadata = info_->read_metadata(
+      storage_options_.uri, storage_options_.storage_id);
   } catch (std::runtime_error & e) {
     (void) e;
-    ROSBAG2_TRANSPORT_LOG_ERROR_STREAM("Could not read metadata for " << uri << ". Please specify "
+    ROSBAG2_TRANSPORT_LOG_ERROR_STREAM("Could not read metadata for " << storage_options_.uri <<
+      ". Please specify "
       "the path to the folder containing an existing 'metadata.yaml' file or provide correct "
       "storage id if metadata file doesn't exist (see help).");
     return;

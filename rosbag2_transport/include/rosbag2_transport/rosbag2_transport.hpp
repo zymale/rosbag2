@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "rosbag2_transport/play_options.hpp"
+#include "rosbag2_transport/node_options.hpp"
 #include "rosbag2_transport/record_options.hpp"
 #include "rosbag2_transport/storage_options.hpp"
 #include "rosbag2_transport/visibility_control.hpp"
@@ -42,20 +43,19 @@ class Rosbag2Transport
 public:
   /// Default constructor
   ROSBAG2_TRANSPORT_PUBLIC
-  Rosbag2Transport();
+  explicit Rosbag2Transport(NodeOptions node_options, StorageOptions storage_options);
 
   /// Constructor for testing, allows to set the reader and writer to use
   ROSBAG2_TRANSPORT_PUBLIC
   Rosbag2Transport(
+    NodeOptions node_options,
+    StorageOptions storage_options,
     std::shared_ptr<rosbag2::SequentialReader> reader,
     std::shared_ptr<rosbag2::Writer> writer,
     std::shared_ptr<rosbag2::Info> info);
 
   ROSBAG2_TRANSPORT_PUBLIC
-  void init();
-
-  ROSBAG2_TRANSPORT_PUBLIC
-  void shutdown();
+  ~Rosbag2Transport();
 
   /**
    * Records topics to a bagfile. Subscription happens at startup time, hence the topics must
@@ -65,7 +65,7 @@ public:
    * \param record_options Options regarding the recording (e.g. the topics to record)
    */
   ROSBAG2_TRANSPORT_PUBLIC
-  void record(const StorageOptions & storage_options, const RecordOptions & record_options);
+  void record(const RecordOptions & record_options);
 
   /**
    * Replay all topics in a bagfile.
@@ -74,7 +74,7 @@ public:
    * \param play_options Options regarding the playback (e.g. queue size)
    */
   ROSBAG2_TRANSPORT_PUBLIC
-  void play(const StorageOptions & storage_options, const PlayOptions & play_options);
+  void play(const PlayOptions & play_options);
 
   /**
    * Print the bag info contained in the metadata yaml file.
@@ -82,10 +82,11 @@ public:
    * \param uri path to the metadata yaml file.
    */
   ROSBAG2_TRANSPORT_PUBLIC
-  void print_bag_info(const std::string & uri, const std::string & storage_id);
+  void print_bag_info();
 
 private:
-  std::shared_ptr<Rosbag2Node> setup_node(std::string node_prefix = "");
+  rosbag2_transport::NodeOptions node_options_;
+  rosbag2_transport::StorageOptions storage_options_;
 
   std::shared_ptr<rosbag2::SequentialReader> reader_;
   std::shared_ptr<rosbag2::Writer> writer_;

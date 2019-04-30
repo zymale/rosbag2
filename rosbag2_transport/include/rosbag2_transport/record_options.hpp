@@ -23,13 +23,11 @@ namespace rosbag2_transport
 {
 struct RecordOptions
 {
-public:
   bool all;
   bool is_discovery_disabled;
   std::vector<std::string> topics;
   std::string rmw_serialization_format;
   std::chrono::milliseconds topic_polling_interval;
-  std::string node_prefix = "";
 };
 
 }  // namespace rosbag2_transport
