@@ -20,6 +20,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "rclcpp/serialized_message.hpp"
+#include "rclcpp/time.hpp"
+
 #include "rosbag2_cpp/converter_options.hpp"
 #include "rosbag2_cpp/storage_options.hpp"
 #include "rosbag2_cpp/visibility_control.hpp"
@@ -108,6 +111,20 @@ public:
    * \throws runtime_error if the Writer is not open.
    */
   void write(std::shared_ptr<rosbag2_storage::SerializedBagMessage> message);
+
+  /**
+   * Write a serialized message to a bagfile.
+   * The topic needs to have been created before writing is possible.
+   *
+   * \param message rclcpp::SerializedMessage The serialized message to be written to the bagfile
+   * \param topic The topic name to which this message belongs
+   * \param time The time stamp of the message
+   * \throws runtime_error if the Writer is not open.
+   */
+  void write(
+    const rclcpp::SerializedMessage & message,
+    const std::string & topic,
+    const rclcpp::Time & time);
 
   writer_interfaces::BaseWriterInterface & get_implementation_handle() const
   {

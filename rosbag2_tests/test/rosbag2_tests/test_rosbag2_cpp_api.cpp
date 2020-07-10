@@ -17,11 +17,11 @@
 #include <memory>
 #include <string>
 
+#include "rclcpp/clock.hpp"
 #include "rclcpp/serialization.hpp"
 #include "rclcpp/serialized_message.hpp"
 
 #include "rcpputils/filesystem_helper.hpp"
-#include "rcutils/time.h"
 
 #include "rosbag2_cpp/reader.hpp"
 #include "rosbag2_cpp/readers/sequential_reader.hpp"
@@ -50,23 +50,13 @@ TEST(TestRosbag2CPPAPI, minimal_writer_example)
     rosbag2_cpp::Writer writer;
     writer.open(rosbag_directory.string());
 
-    auto bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
-    auto ret = rcutils_system_time_now(&bag_message->time_stamp);
-    if (ret != RCL_RET_OK) {
-      FAIL() << "couldn't assign time rosbag message";
-    }
-
     rosbag2_storage::TopicMetadata tm;
     tm.name = "/my/test/topic";
     tm.type = "test_msgs/msg/BasicTypes";
     tm.serialization_format = "cdr";
     writer.create_topic(tm);
 
-    bag_message->topic_name = tm.name;
-    bag_message->serialized_data = std::shared_ptr<rcutils_uint8_array_t>(
-      &serialized_msg.get_rcl_serialized_message(), [](rcutils_uint8_array_t * /* data */) {});
-
-    writer.write(bag_message);
+    writer.write(serialized_msg, tm.name, rclcpp::Clock().now());
     // close on scope exit
   }
 

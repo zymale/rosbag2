@@ -21,6 +21,8 @@
 #include <string>
 #include <utility>
 
+#include "rcutils/types/uint8_array.h"
+
 #include "rosbag2_cpp/info.hpp"
 #include "rosbag2_cpp/storage_options.hpp"
 #include "rosbag2_cpp/writer_interfaces/base_writer_interface.hpp"
@@ -49,6 +51,7 @@ void Writer::open(const std::string & uri)
   storage_options.max_cache_size = 0;  // default
 
   rosbag2_cpp::ConverterOptions converter_options{};
+
   return open(storage_options, converter_options);
 }
 
@@ -71,6 +74,24 @@ void Writer::remove_topic(const rosbag2_storage::TopicMetadata & topic_with_type
 void Writer::write(std::shared_ptr<rosbag2_storage::SerializedBagMessage> message)
 {
   writer_impl_->write(message);
+}
+
+void Writer::write(
+  const rclcpp::SerializedMessage & message,
+  const std::string & topic,
+  const rclcpp::Time & time)
+{
+  auto serialized_bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+  serialized_bag_message->topic_name = topic;
+  serialized_bag_message->time_stamp = time.nanoseconds();
+
+  // temporary store the payload in a shared_ptr.
+  // add custom no-op deleter to avoid deep copying data.
+  serialized_bag_message->serialized_data = std::shared_ptr<rcutils_uint8_array_t>(
+    const_cast<rcutils_uint8_array_t *>(&message.get_rcl_serialized_message()),
+    [](rcutils_uint8_array_t * /* data */) {});
+
+  return write(serialized_bag_message);
 }
 
 }  // namespace rosbag2_cpp

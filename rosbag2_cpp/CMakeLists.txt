@@ -38,6 +38,7 @@ find_package(ament_index_cpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(rcutils REQUIRED)
+find_package(rclcpp REQUIRED)
 find_package(rosbag2_storage REQUIRED)
 find_package(rosidl_runtime_c REQUIRED)
 find_package(rosidl_runtime_cpp REQUIRED)
@@ -61,6 +62,7 @@ ament_target_dependencies(${PROJECT_NAME}
   pluginlib
   rcpputils
   rcutils
+  rclcpp
   rosbag2_storage
   rosidl_runtime_c
   rosidl_runtime_cpp
@@ -96,6 +98,7 @@ ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_targets(export_${PROJECT_NAME})
 ament_export_dependencies(pluginlib
+  rclcpp
   rosbag2_storage
   rosidl_runtime_c
   rosidl_runtime_cpp
