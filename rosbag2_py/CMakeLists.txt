@@ -63,24 +63,26 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_pytest REQUIRED)
 
+  # Provides PYTHON_EXECUTABLE_DEBUG
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
-  if(WIN32 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
   endif()
+
+  # Set PYTHONPATH
   set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
   if(NOT WIN32)
     string(REPLACE ";" ":" pythonpath "${pythonpath}")
   endif()
+
   ament_add_pytest_test(test_sequential_reader_py "test/test_sequential_reader.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}"
     APPEND_ENV "PYTHONPATH=${pythonpath}"
-    APPEND_LIBRARY_DIRS "${_append_library_dirs}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/resources"
   )
   ament_add_pytest_test(test_sequential_writer_py "test/test_sequential_writer.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}"
     APPEND_ENV "PYTHONPATH=${pythonpath}"
-    APPEND_LIBRARY_DIRS "${_append_library_dirs}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/resources"
   )
 endif()
