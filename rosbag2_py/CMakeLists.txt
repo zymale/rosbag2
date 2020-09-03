@@ -15,7 +15,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
-find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(rosbag2_compression REQUIRED)
@@ -61,6 +60,8 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_pytest REQUIRED)
+  find_package(python_cmake_module REQUIRED)
+  find_package(rclpy REQUIRED)
 
   set(_append_library_dirs "")
   if(WIN32)
@@ -68,7 +69,6 @@ if(BUILD_TESTING)
   endif()
 
   # Provides PYTHON_EXECUTABLE_DEBUG
-  find_package(python_cmake_module REQUIRED)
   # Manually looking for Python interpreter is needed for Windows Debug mode
   # to find rclpy
   find_package(PythonLibs 3.5 REQUIRED)
