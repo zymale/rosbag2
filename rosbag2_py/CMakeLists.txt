@@ -69,8 +69,10 @@ if(BUILD_TESTING)
 
   # Provides PYTHON_EXECUTABLE_DEBUG
   find_package(python_cmake_module REQUIRED)
-  # PythonExtra is needed for Windows Debug mode to find rclpy
-  find_package(PythonExtra REQUIRED)
+  # Manually looking for Python interpreter is needed for Windows Debug mode
+  # to find rclpy
+  find_package(PythonLibs REQUIRED)
+  find_package(PythonInterp REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
