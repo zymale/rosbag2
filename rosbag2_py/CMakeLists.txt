@@ -18,7 +18,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(pybind11 REQUIRED)
-find_package(python_cmake_module REQUIRED)
 find_package(rosbag2_compression REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
 find_package(rosbag2_storage REQUIRED)
@@ -69,6 +68,9 @@ if(BUILD_TESTING)
   endif()
 
   # Provides PYTHON_EXECUTABLE_DEBUG
+  find_package(python_cmake_module REQUIRED)
+  # PythonExtra is needed for Windows Debug mode to find rclpy
+  find_package(PythonExtra REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
