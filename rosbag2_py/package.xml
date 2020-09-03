@@ -12,7 +12,7 @@
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
-  <build_depend>rclpy</depend>
+  <build_depend>rclpy</build_depend>
 
   <depend>pybind11_vendor</depend>
   <depend>python_cmake_module</depend>
