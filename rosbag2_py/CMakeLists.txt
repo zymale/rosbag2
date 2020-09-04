@@ -70,8 +70,9 @@ if(BUILD_TESTING)
   # Manually looking for Python interpreter is needed for Windows Debug mode
   # to find rclpy???
   find_package(python_cmake_module REQUIRED)
+  # find_package(Python REQUIRED)  # Try this next
+  find_package(PythonLibs 3.5 REQUIRED)
   find_package(PythonExtra REQUIRED)
-  #find_package(PythonLibs 3.5 REQUIRED)
   #find_package(PythonInterp 3.5 REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
