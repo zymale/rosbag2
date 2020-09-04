@@ -60,8 +60,6 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_pytest REQUIRED)
-  find_package(python_cmake_module REQUIRED)
-  find_package(rclpy REQUIRED)
 
   set(_append_library_dirs "")
   if(WIN32)
@@ -70,9 +68,11 @@ if(BUILD_TESTING)
 
   # Provides PYTHON_EXECUTABLE_DEBUG
   # Manually looking for Python interpreter is needed for Windows Debug mode
-  # to find rclpy
-  find_package(PythonLibs 3.5 REQUIRED)
-  find_package(PythonInterp 3.5 REQUIRED)
+  # to find rclpy???
+  find_package(python_cmake_module REQUIRED)
+  find_package(PythonExtra REQUIRED)
+  #find_package(PythonLibs 3.5 REQUIRED)
+  #find_package(PythonInterp 3.5 REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
