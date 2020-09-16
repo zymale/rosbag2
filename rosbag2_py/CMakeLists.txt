@@ -21,6 +21,29 @@ find_package(rosbag2_compression REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
 find_package(rosbag2_storage REQUIRED)
 
+
+# Moving all the Python setup up here to see if helps with pybind11_add_module
+
+# Provides PYTHON_EXECUTABLE_DEBUG
+# Manually looking for Python interpreter is needed for Windows Debug mode
+# to find rclpy???
+find_package(python_cmake_module REQUIRED)
+# find_package(Python REQUIRED)  # Try this next
+find_package(PythonLibs 3.5 REQUIRED)
+find_package(PythonExtra REQUIRED)
+#find_package(PythonInterp 3.5 REQUIRED)
+set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
+if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
+endif()
+
+# Set PYTHONPATH
+set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
+if(NOT WIN32)
+  string(REPLACE ";" ":" pythonpath "${pythonpath}")
+endif()
+
+
 ament_python_install_package(${PROJECT_NAME})
 
 pybind11_add_module(_reader SHARED
@@ -69,21 +92,21 @@ if(BUILD_TESTING)
   # Provides PYTHON_EXECUTABLE_DEBUG
   # Manually looking for Python interpreter is needed for Windows Debug mode
   # to find rclpy???
-  find_package(python_cmake_module REQUIRED)
+#  find_package(python_cmake_module REQUIRED)
   # find_package(Python REQUIRED)  # Try this next
-  find_package(PythonLibs 3.5 REQUIRED)
-  find_package(PythonExtra REQUIRED)
+#  find_package(PythonLibs 3.5 REQUIRED)
+#  find_package(PythonExtra REQUIRED)
   #find_package(PythonInterp 3.5 REQUIRED)
-  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
-  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
-  endif()
+#  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
+#  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+#    set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
+#  endif()
 
   # Set PYTHONPATH
-  set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
-  if(NOT WIN32)
-    string(REPLACE ";" ":" pythonpath "${pythonpath}")
-  endif()
+#  set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
+#  if(NOT WIN32)
+#    string(REPLACE ";" ":" pythonpath "${pythonpath}")
+#  endif()
 
   ament_add_pytest_test(test_sequential_reader_py "test/test_sequential_reader.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}"
