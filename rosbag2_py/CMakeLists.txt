@@ -52,6 +52,7 @@ pybind11_add_module(_reader SHARED
 ament_target_dependencies(_reader PUBLIC
   "rosbag2_compression"
   "rosbag2_cpp"
+  "PythonExtra"
 )
 
 pybind11_add_module(_storage SHARED
@@ -60,6 +61,7 @@ pybind11_add_module(_storage SHARED
 ament_target_dependencies(_storage PUBLIC
   "rosbag2_cpp"
   "rosbag2_storage"
+  "PythonExtra"
 )
 
 pybind11_add_module(_writer SHARED
@@ -68,6 +70,7 @@ pybind11_add_module(_writer SHARED
 ament_target_dependencies(_writer PUBLIC
   "rosbag2_compression"
   "rosbag2_cpp"
+  "PythonExtra"
 )
 
 # Install cython modules as sub-modules of the project
