@@ -31,7 +31,7 @@ find_package(rosbag2_storage REQUIRED)
 find_package(python_cmake_module REQUIRED)
 find_package(Python REQUIRED)  # Try this next
 #find_package(PythonLibs 3.5 REQUIRED)
-#find_package(PythonExtra REQUIRED)
+find_package(PythonExtra REQUIRED)
 #find_package(PythonInterp 3.5 REQUIRED)
 set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
 if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -53,7 +53,7 @@ pybind11_add_module(_reader SHARED
 ament_target_dependencies(_reader PUBLIC
   "rosbag2_compression"
   "rosbag2_cpp"
-  #"PythonExtra"
+  "PythonExtra"
 )
 
 pybind11_add_module(_storage SHARED
@@ -62,7 +62,7 @@ pybind11_add_module(_storage SHARED
 ament_target_dependencies(_storage PUBLIC
   "rosbag2_cpp"
   "rosbag2_storage"
-  #"PythonExtra"
+  "PythonExtra"
 )
 
 pybind11_add_module(_writer SHARED
@@ -71,7 +71,7 @@ pybind11_add_module(_writer SHARED
 ament_target_dependencies(_writer PUBLIC
   "rosbag2_compression"
   "rosbag2_cpp"
-  #"PythonExtra"
+  "PythonExtra"
 )
 
 # Install cython modules as sub-modules of the project
