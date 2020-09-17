@@ -22,17 +22,20 @@ find_package(rosbag2_compression REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
 find_package(rosbag2_storage REQUIRED)
 
+# Manually looking for Python interpreter is needed for Windows Debug mode
+# to find rclpy???
+find_package(python_cmake_module REQUIRED)
+#find_package(Python REQUIRED)
+find_package(PythonLibs 3.5 REQUIRED)
+find_package(PythonExtra REQUIRED)
+#find_package(PythonInterp 3.5 REQUIRED)
+
+ament_python_install_package(${PROJECT_NAME})
+
 
 # Moving all the Python setup up here to see if helps with pybind11_add_module
 
 # Provides PYTHON_EXECUTABLE_DEBUG
-# Manually looking for Python interpreter is needed for Windows Debug mode
-# to find rclpy???
-find_package(python_cmake_module REQUIRED)
-find_package(Python REQUIRED)  # Try this next
-#find_package(PythonLibs 3.5 REQUIRED)
-find_package(PythonExtra REQUIRED)
-#find_package(PythonInterp 3.5 REQUIRED)
 set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
 if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
@@ -44,8 +47,6 @@ if(NOT WIN32)
   string(REPLACE ";" ":" pythonpath "${pythonpath}")
 endif()
 
-
-ament_python_install_package(${PROJECT_NAME})
 
 pybind11_add_module(_reader SHARED
   src/rosbag2_py/_reader.cpp
