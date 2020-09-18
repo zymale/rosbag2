@@ -15,38 +15,13 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
-find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_python REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(rosbag2_compression REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
 find_package(rosbag2_storage REQUIRED)
 
-# Manually looking for Python interpreter is needed for Windows Debug mode
-# to find rclpy???
-find_package(python_cmake_module REQUIRED)
-#find_package(Python REQUIRED)
-find_package(PythonLibs 3.5 REQUIRED)
-find_package(PythonExtra REQUIRED)
-#find_package(PythonInterp 3.5 REQUIRED)
-
 ament_python_install_package(${PROJECT_NAME})
-
-
-# Moving all the Python setup up here to see if helps with pybind11_add_module
-
-# Provides PYTHON_EXECUTABLE_DEBUG
-set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
-if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
-endif()
-
-# Set PYTHONPATH
-set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
-if(NOT WIN32)
-  string(REPLACE ";" ":" pythonpath "${pythonpath}")
-endif()
-
 
 pybind11_add_module(_reader SHARED
   src/rosbag2_py/_reader.cpp
@@ -54,7 +29,6 @@ pybind11_add_module(_reader SHARED
 ament_target_dependencies(_reader PUBLIC
   "rosbag2_compression"
   "rosbag2_cpp"
-  "PythonExtra"
 )
 
 pybind11_add_module(_storage SHARED
@@ -63,7 +37,6 @@ pybind11_add_module(_storage SHARED
 ament_target_dependencies(_storage PUBLIC
   "rosbag2_cpp"
   "rosbag2_storage"
-  "PythonExtra"
 )
 
 pybind11_add_module(_writer SHARED
@@ -72,7 +45,6 @@ pybind11_add_module(_writer SHARED
 ament_target_dependencies(_writer PUBLIC
   "rosbag2_compression"
   "rosbag2_cpp"
-  "PythonExtra"
 )
 
 # Install cython modules as sub-modules of the project
@@ -97,21 +69,21 @@ if(BUILD_TESTING)
   # Provides PYTHON_EXECUTABLE_DEBUG
   # Manually looking for Python interpreter is needed for Windows Debug mode
   # to find rclpy???
-#  find_package(python_cmake_module REQUIRED)
+  find_package(python_cmake_module REQUIRED)
   # find_package(Python REQUIRED)  # Try this next
-#  find_package(PythonLibs 3.5 REQUIRED)
-#  find_package(PythonExtra REQUIRED)
+  find_package(PythonLibs 3.5 REQUIRED)
+  find_package(PythonExtra REQUIRED)
   #find_package(PythonInterp 3.5 REQUIRED)
-#  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
-#  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
-#  endif()
+  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
+  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
+  endif()
 
   # Set PYTHONPATH
-#  set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
-#  if(NOT WIN32)
-#    string(REPLACE ";" ":" pythonpath "${pythonpath}")
-#  endif()
+  set(pythonpath "${CMAKE_CURRENT_BINARY_DIR}/rosbag2_py;${CMAKE_CURRENT_SOURCE_DIR}")
+  if(NOT WIN32)
+    string(REPLACE ";" ":" pythonpath "${pythonpath}")
+  endif()
 
   ament_add_pytest_test(test_sequential_reader_py "test/test_sequential_reader.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}"
